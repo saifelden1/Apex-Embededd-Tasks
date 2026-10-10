@@ -1,91 +1,125 @@
-# Apex Racing Team — Embedded Systems Learning Phase
+# Task 3 — Dual-STM32 Inter-Board UART Communication & Display Interface
 
-[![Platform](https://img.shields.io/badge/Platform-STM32F103C8T6%20(Blue%20Pill)-blue.svg)](https://www.st.com)
-[![IDE](https://img.shields.io/badge/IDE-STM32CubeIDE%20v1.14+-darkgreen.svg)](https://www.st.com/en/development-tools/stm32cubeide.html)
-[![Simulation](https://img.shields.io/badge/Simulation-Proteus%208.13+-orange.svg)](https://www.labcenter.com)
-[![Language](https://img.shields.io/badge/Language-Embedded%20C-brightgreen.svg)](#)
-
-Welcome to the **Apex Racing Team** Embedded Systems Onboarding & Training Track. This training program is designed to build foundational hands-on proficiency in microcontroller architecture, peripheral interfacing, modular driver development, and hardware-in-the-loop / schematic simulation.
+[![Target](https://img.shields.io/badge/Target-2x%20STM32F103C8T6-blue.svg)](#)
+[![Protocol](https://img.shields.io/badge/Protocol-UART%20%2F%20USART-brightgreen.svg)](#)
+[![Peripherals](https://img.shields.io/badge/Peripherals-USART1%20%7C%20Display%20Interface-orange.svg)](#)
 
 ---
 
-## Repository Structure & Branch Map
+## Objective
+In racing vehicle architecture, modern Electronic Control Units (ECUs) do not operate in isolation. Multiple microcontrollers communicate across onboard serial buses (UART, CAN, LIN) to exchange telemetry, state variables, and dashboard alerts.
 
-This repository uses dedicated Git branches for each milestone. Clone the repository and switch to the branch corresponding to your current task:
+The goal of this task is to configure a **Dual-STM32 Distributed System**:
+1. **Transmitter Node (ECU-1 / Sensor Node)**: Gathers simulated telemetry parameters (Speed, Battery Voltage, Lap Count, Status Flag), packages them into a robust serialized data packet, and transmits over **USART**.
+2. **Receiver Node (ECU-2 / Telemetry Dashboard Node)**: Receives the serialized data packet, parses and validates the frame, and formats the real-time telemetry onto a **Screen / Display interface**.
+3. **Modular Driver Abstraction**:
+   * Implement modular serial packet communication drivers (`uart_comm.h/.c`).
+   * Implement a hardware-independent display driver layer (`display_interface.h/.c`), allowing the display hardware (16x2 Parallel LCD, I2C Display, OLED, or Proteus Virtual Terminal) to be swapped without changing core business logic.
 
-```bash
-git clone https://github.com/saifelden1/Apex-Embededd-Tasks.git
-cd Apex-Embededd-Tasks
+---
+
+## System Architecture & Pin Mapping
+
+```
+      +--------------------+                      +--------------------+
+      |   ECU-1 (Sender)   |                      |  ECU-2 (Receiver)  |
+      |   [STM32F103C8]    |                      |   [STM32F103C8]    |
+      |                    |                      |                    |
+      |       PA9 (USART_TX)--------------------->| PA10 (USART_RX)    |
+      |                    |                      |                    |
+      |                GND |----------------------| GND (Common Ground)|
+      +--------------------+                      +---------+----------+
+                                                            |
+                                                            | [Display Bus]
+                                                            v
+                                                  +--------------------+
+                                                  |  Display / Screen  |
+                                                  +--------------------+
 ```
 
-| Branch | Task Name | Key Focus | Target Hardware |
+### Pin Mapping Table
+| Node | Function | MCU Pin | Connected To |
 | :--- | :--- | :--- | :--- |
-| `main` | **Track Hub** | Guidelines, setup instructions, policies | — |
-| `task-1-gpio-led` | **Task 1: GPIO & LED Driver** | Clock tree, Push-Pull GPIO, Modular driver | STM32 Blue Pill + LEDs |
-| `task-2-adc-pwm` | **Task 2: ADC & Timer PWM** | Potentiometer sampling, Timer PWM dimming, ADC modes | STM32 Blue Pill + Pot + LED |
-| `task-3-uart-display` | **Task 3: Dual-MCU UART & Display** | Cross-board serial telemetry, Display driver | 2x STM32 Blue Pill + Screen |
+| **ECU-1 (Transmitter)** | `USART1_TX` | `PA9` | ECU-2 `PA10` (`USART1_RX`) |
+| **ECU-1 (Transmitter)** | Ground | `GND` | ECU-2 `GND` (Mandatory common reference) |
+| **ECU-2 (Receiver)** | `USART1_RX` | `PA10` | ECU-1 `PA9` (`USART1_TX`) |
+| **ECU-2 (Receiver)** | Display Interface | Configurable | Screen Data/Control Bus |
 
-To switch to a task branch:
-```bash
-git checkout <branch-name>
+---
+
+## Telemetry Packet Protocol Specification
+
+To prevent data corruption, framing errors, or partial reads, data transmitted over the serial link must adhere to a structured packet format:
+
+```
++------------+-------------+----------------+----------------+-----------+----------+
+| START BYTE | PACKET ID   | SPEED (km/h)   | VOLTAGE (mV)   | CHECKSUM  | END BYTE |
+|   (0xAA)   |   (1 Byte)  |   (2 Bytes)    |   (2 Bytes)    |  (1 Byte) |  (0x55)  |
++------------+-------------+----------------+----------------+-----------+----------+
 ```
 
----
-
-## Training Philosophy & AI Usage Policy
-
-> [!IMPORTANT]
-> **AI Usage & Oral Code Defense Policy**
-> * Using AI tools (ChatGPT, Claude, Copilot, Gemini, etc.) as learning assistants, documentation summarizers, and debugging aids is **permitted and encouraged**.
-> * **However**, submitting code generated without full comprehension is strictly disqualified.
-> * **Every applicant will participate in an oral code defense interview where you will be asked to explain and justify every single line of code, register configuration, and HAL API call in your submission.**
-> * If you cannot clearly explain why a line exists, how the underlying hardware register responds, or how timing is affected, the task will not be accepted.
+* **Start Delimiter**: `0xAA` (Identifies beginning of valid frame).
+* **Packet ID**: Incremental counter ($0 - 255$) to detect lost frames.
+* **Payload**:
+  * `Speed`: Unsigned 16-bit integer ($0 - 300\text{ km/h}$).
+  * `Battery Voltage`: Unsigned 16-bit integer ($9000 - 14000\text{ mV} \rightarrow 9.0\text{V} - 14.0\text{V}$).
+* **Checksum**: Simple XOR or 8-bit sum of payload bytes to guarantee data integrity.
+* **End Delimiter**: `0x55` (Signifies end of frame).
 
 ---
 
-## Required Submission Package
+## Technical Milestones
 
-For each completed task branch, you must provide:
+### Milestone 1: USART Peripheral Configuration
+* **Baud Rate**: `115200 bps` (standard for automotive debug telemetry).
+* **Word Length**: 8 Bits.
+* **Stop Bits**: 1 Stop Bit.
+* **Parity**: None (8N1).
+* **Mode**:
+  * ECU-1: Asynchronous Transmit Only (or TX/RX).
+  * ECU-2: Asynchronous Receive Only (or TX/RX), enabled with **Interrupt** (`HAL_UART_Receive_IT`) or **DMA with Idle Line Detection**.
 
-1. **Modular Source Code**:
-   * Clean separation between application logic (`Core/Src/main.c`) and hardware peripherals.
-   * Dedicated `.h` (header) and `.c` (source) files inside `Drivers/BSP/` for all connected hardware.
-2. **Simulation / Hardware Verification Media**:
-   * High-resolution screenshots demonstrating the working circuit in **Proteus** (or physical bench).
-   * Short recorded demo video (or GIF) showcasing the dynamic functionality (e.g., LED toggling at the expected frequency, PWM changing with pot rotation, UART data streaming to display).
-3. **Task Documentation (`README.md` / Report)**:
-   * A detailed report (using the provided `Template_Report.md`) documenting:
-     * Clock configuration & peripheral settings.
-     * Hardware wiring / schematic breakdown.
-     * Architectural decisions behind your `.c`/`.h` driver design.
-     * Challenges encountered, bugs diagnosed, and the exact steps taken to fix them.
+### Milestone 2: Modular UART Packet Driver (`uart_comm.h` & `uart_comm.c`)
+Create a modular communication driver:
+* Serializes telemetry structure into the byte array frame.
+* Parses received byte streams and handles packet validation via state-machine decoding (`WAIT_START`, `READ_PAYLOAD`, `VERIFY_CHECKSUM`).
 
----
+### Milestone 3: Modular Display Abstraction (`display_interface.h` & `display_interface.c`)
+Structure the display driver so that application code only invokes abstract functions:
+```c
+void Display_Init(void);
+void Display_Clear(void);
+void Display_SetCursor(uint8_t row, uint8_t col);
+void Display_PrintString(const char *str);
+void Display_PrintTelemetry(uint16_t speed, float voltage);
+```
+*(The underlying implementation can target Proteus Character LCD, I2C backpack, or Virtual Terminal).*
 
-## Environment & Toolchain Setup
-
-### 1. Development Environment
-* **IDE**: [STM32CubeIDE (v1.14.0 or newer)](https://www.st.com/en/development-tools/stm32cubeide.html).
-* **Compiler**: GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`), packaged with CubeIDE.
-* **Firmware Package**: STM32Cube FW_F1 (Firmware package for STM32F1 series).
-
-### 2. Simulation Environment
-* **Proteus Design Suite**: Proteus 8.13 SP0 or higher.
-* Ensure the **STM32F103C8** model is available in your Proteus library.
-* Set the microcontroller properties in Proteus to:
-  * **Crystal Frequency**: `8MHz` (or `72MHz` internal clock matching your RCC settings).
-  * **Program File**: Point directly to your compiled `.hex` output located in `Firmware/Debug/`.
-
-### 3. Physical Hardware (Optional / Bonus)
-* STM32F103C8T6 "Blue Pill" development board.
-* ST-Link V2 programmer / debugger.
-* Solderless breadboard, jumper wires, potentiometers (10kΩ), resistors (220Ω, 330Ω), and LEDs.
+### Milestone 4: Proteus Simulation & Verification
+1. Place two `STM32F103C8` instances in Proteus 8.
+2. Wire `PA9` of Node 1 directly to `PA10` of Node 2.
+3. Attach a **Virtual Terminal** to the communication line to observe raw ASCII / hex frames in real time.
+4. Connect the display to Node 2 and compile both firmware images (`Transmitter.hex` and `Receiver.hex`).
+5. Verify dynamic updating of received numbers on the display.
 
 ---
 
-## General Engineering Directives
+## Oral Code Defense Preparation (Interview Topics)
 
-* **No Sprawling `main.c`**: Never dump low-level driver logic directly into `main.c`. Keep `main.c` reserved for state initialization and application loop coordination.
-* **Defensive Programming**: Check return statuses of HAL initialization routines.
-* **Non-Blocking Architecture**: Avoid blocking `HAL_Delay()` wherever timers or state machines can achieve non-blocking execution.
-* **Meaningful Git Commits**: Commit regularly as you pass milestones. Write descriptive commit messages.
+1. **Common Ground Necessity**: Why must the grounds of two physical microcontrollers be tied together in single-ended UART communication? What happens if they are not?
+2. **Buffer Overrun & Ring Buffers**: What happens if ECU-1 sends packets faster than ECU-2 can update its screen? How does a circular ring buffer or DMA prevent dropped bytes?
+3. **Framing & Parity**: What causes a UART framing error? How does the start and stop bit mechanism ensure clock synchronization between independent crystal oscillators?
+4. **Packet Synchronization**: Why is a delimiter byte (`0xAA`) or checksum essential when transmitting multi-byte binary structures?
+
+---
+
+## Required Deliverables
+
+1. **Source Code**:
+   * `Firmware/Transmitter_Node/`: CubeIDE project for ECU-1.
+   * `Firmware/Receiver_Node/`: CubeIDE project for ECU-2 including `display_interface` and `uart_comm` drivers.
+2. **Simulation / Hardware Media**:
+   * Proteus screenshot showing both microcontrollers communicating and the display updating.
+   * Video demo showing dynamic packet reception and telemetry refresh.
+3. **Task Documentation Report**:
+   * Completed [`Template_Report.md`](Template_Report.md) documenting packet structure, baudrate calculations, state machine design, and debugging hurdles.
