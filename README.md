@@ -1,91 +1,103 @@
-# Apex Racing Team — Embedded Systems Learning Phase
+# Task 1 — STM32F103C8T6 GPIO Configuration & Modular LED Driver
 
-[![Platform](https://img.shields.io/badge/Platform-STM32F103C8T6%20(Blue%20Pill)-blue.svg)](https://www.st.com)
-[![IDE](https://img.shields.io/badge/IDE-STM32CubeIDE%20v1.14+-darkgreen.svg)](https://www.st.com/en/development-tools/stm32cubeide.html)
-[![Simulation](https://img.shields.io/badge/Simulation-Proteus%208.13+-orange.svg)](https://www.labcenter.com)
-[![Language](https://img.shields.io/badge/Language-Embedded%20C-brightgreen.svg)](#)
-
-Welcome to the **Apex Racing Team** Embedded Systems Onboarding & Training Track. This training program is designed to build foundational hands-on proficiency in microcontroller architecture, peripheral interfacing, modular driver development, and hardware-in-the-loop / schematic simulation.
+[![Target](https://img.shields.io/badge/Target-STM32F103C8T6%20(Blue%20Pill)-blue.svg)](#)
+[![Peripheral](https://img.shields.io/badge/Peripheral-GPIO-brightgreen.svg)](#)
+[![Simulation](https://img.shields.io/badge/Simulation-Proteus%208-orange.svg)](#)
 
 ---
 
-## Repository Structure & Branch Map
+## Objective
+The goal of this task is to configure the **STM32F103C8T6 (Blue Pill)** using **STM32CubeIDE**, establish a clean clock configuration, drive both onboard and external LEDs, and encapsulate all hardware-level manipulations into a professional, modular **Board Support Package (BSP)** driver (`led.h` / `led.c`).
 
-This repository uses dedicated Git branches for each milestone. Clone the repository and switch to the branch corresponding to your current task:
+You must verify your implementation via **Proteus 8 simulation** (or physical hardware) and document your steps, bugs, and technical learnings.
 
-```bash
-git clone https://github.com/saifelden1/Apex-Embededd-Tasks.git
-cd Apex-Embededd-Tasks
-```
+---
 
-| Branch | Task Name | Key Focus | Target Hardware |
+## Hardware Specifications & Pin Mapping
+
+| Peripheral | MCU Pin | Electrical Configuration | Logic Behavior |
 | :--- | :--- | :--- | :--- |
-| `main` | **Track Hub** | Guidelines, setup instructions, policies | — |
-| `task-1-gpio-led` | **Task 1: GPIO & LED Driver** | Clock tree, Push-Pull GPIO, Modular driver | STM32 Blue Pill + LEDs |
-| `task-2-adc-pwm` | **Task 2: ADC & Timer PWM** | Potentiometer sampling, Timer PWM dimming, ADC modes | STM32 Blue Pill + Pot + LED |
-| `task-3-uart-display` | **Task 3: Dual-MCU UART & Display** | Cross-board serial telemetry, Display driver | 2x STM32 Blue Pill + Screen |
+| **Onboard User LED** | `PC13` | Open-Drain / Push-Pull output | **Active-LOW** (`0` = ON, `1` = OFF) |
+| **External Red LED** | `PA1` | Push-Pull output with 330Ω resistor to GND | **Active-HIGH** (`1` = ON, `0` = OFF) |
 
-To switch to a task branch:
-```bash
-git checkout <branch-name>
+> [!NOTE]
+> On standard Blue Pill boards, the `PC13` LED cathode is connected to the MCU pin, while the anode is tied to `+3.3V` through a resistor. Driving the pin `LOW` turns the LED on. Your modular driver must handle both **Active-High** and **Active-Low** configurations cleanly without hardcoding inverted logic in `main.c`.
+
+---
+
+## Technical Milestones
+
+### Milestone 1: Clock & GPIO Configuration in STM32CubeIDE
+1. Create a new STM32 project targeting `STM32F103C8Tx`.
+2. Configure RCC: High Speed Clock (HSE) to Crystal/Ceramic Resonator (or HSI if simulating with internal oscillator).
+3. Set SYSCLK to 72 MHz (HSE + PLL) or 8 MHz.
+4. Pinout setup:
+   * Configure `PC13` as `GPIO_Output` (Label: `LED_ONBOARD`).
+   * Configure `PA1` as `GPIO_Output` (Label: `LED_EXTERNAL`).
+   * Output speed: `GPIO_SPEED_FREQ_LOW` (or `MEDIUM`).
+5. Enable **Generate HEX file** in CubeIDE (`Project Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU Post build outputs -> Convert to Intel Hex file`).
+
+### Milestone 2: Modular Driver Architecture (`led.h` & `led.c`)
+Create a modular driver inside `Firmware/Drivers/BSP/LED/` with clean separation of concerns:
+* `led.h`: Defines structures, configuration enums, and public APIs.
+* `led.c`: Implements initialization, toggling, and explicit state setting using HAL/Register calls.
+
+#### Required API Specification:
+```c
+typedef enum {
+    LED_ACTIVE_LOW  = 0,
+    LED_ACTIVE_HIGH = 1
+} LED_ActiveState_t;
+
+typedef enum {
+    LED_STATE_OFF = 0,
+    LED_STATE_ON  = 1
+} LED_State_t;
+
+typedef struct {
+    GPIO_TypeDef       *port;
+    uint16_t           pin;
+    LED_ActiveState_t  active_level;
+    LED_State_t        current_state;
+} LED_Handle_t;
+
+void LED_Init(LED_Handle_t *hled, GPIO_TypeDef *port, uint16_t pin, LED_ActiveState_t active_level);
+void LED_SetState(LED_Handle_t *hled, LED_State_t state);
+void LED_On(LED_Handle_t *hled);
+void LED_Off(LED_Handle_t *hled);
+void LED_Toggle(LED_Handle_t *hled);
 ```
 
----
+### Milestone 3: Application Logic in `main.c`
+In `Core/Src/main.c`, initialize both LEDs using the handles and create a blinking sequence:
+* Synchronous toggle: Alternate blinking between the on-board LED and external LED every 500ms.
+* Keep `main.c` free of raw `HAL_GPIO_WritePin` calls for the LEDs — use your `LED_*` BSP functions.
 
-## Training Philosophy & AI Usage Policy
-
-> [!IMPORTANT]
-> **AI Usage & Oral Code Defense Policy**
-> * Using AI tools (ChatGPT, Claude, Copilot, Gemini, etc.) as learning assistants, documentation summarizers, and debugging aids is **permitted and encouraged**.
-> * **However**, submitting code generated without full comprehension is strictly disqualified.
-> * **Every applicant will participate in an oral code defense interview where you will be asked to explain and justify every single line of code, register configuration, and HAL API call in your submission.**
-> * If you cannot clearly explain why a line exists, how the underlying hardware register responds, or how timing is affected, the task will not be accepted.
-
----
-
-## Required Submission Package
-
-For each completed task branch, you must provide:
-
-1. **Modular Source Code**:
-   * Clean separation between application logic (`Core/Src/main.c`) and hardware peripherals.
-   * Dedicated `.h` (header) and `.c` (source) files inside `Drivers/BSP/` for all connected hardware.
-2. **Simulation / Hardware Verification Media**:
-   * High-resolution screenshots demonstrating the working circuit in **Proteus** (or physical bench).
-   * Short recorded demo video (or GIF) showcasing the dynamic functionality (e.g., LED toggling at the expected frequency, PWM changing with pot rotation, UART data streaming to display).
-3. **Task Documentation (`README.md` / Report)**:
-   * A detailed report (using the provided `Template_Report.md`) documenting:
-     * Clock configuration & peripheral settings.
-     * Hardware wiring / schematic breakdown.
-     * Architectural decisions behind your `.c`/`.h` driver design.
-     * Challenges encountered, bugs diagnosed, and the exact steps taken to fix them.
+### Milestone 4: Proteus Simulation & Verification
+1. Open or build the circuit in Proteus 8 (refer to [`Simulation/Proteus/README.md`](Simulation/Proteus/README.md)).
+2. Connect `STM32F103C8` with an external LED on `PA1` (via 330Ω resistor) and probe `PC13`.
+3. Load the compiled `.hex` file into the STM32 model properties.
+4. Run the interactive simulation and record evidence.
 
 ---
 
-## Environment & Toolchain Setup
+## Oral Code Defense Preparation (Interview Topics)
 
-### 1. Development Environment
-* **IDE**: [STM32CubeIDE (v1.14.0 or newer)](https://www.st.com/en/development-tools/stm32cubeide.html).
-* **Compiler**: GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`), packaged with CubeIDE.
-* **Firmware Package**: STM32Cube FW_F1 (Firmware package for STM32F1 series).
-
-### 2. Simulation Environment
-* **Proteus Design Suite**: Proteus 8.13 SP0 or higher.
-* Ensure the **STM32F103C8** model is available in your Proteus library.
-* Set the microcontroller properties in Proteus to:
-  * **Crystal Frequency**: `8MHz` (or `72MHz` internal clock matching your RCC settings).
-  * **Program File**: Point directly to your compiled `.hex` output located in `Firmware/Debug/`.
-
-### 3. Physical Hardware (Optional / Bonus)
-* STM32F103C8T6 "Blue Pill" development board.
-* ST-Link V2 programmer / debugger.
-* Solderless breadboard, jumper wires, potentiometers (10kΩ), resistors (220Ω, 330Ω), and LEDs.
+During the technical review, you will be asked to explain and defend every line of code submitted. Be prepared to answer:
+1. **Underlying Registers**: What registers does `HAL_GPIO_WritePin` modify? (Explain `BSRR` vs `BRR` vs `ODR`).
+2. **Push-Pull vs Open-Drain**: What is the physical MOSFET structure inside the MCU pin for Push-Pull vs Open-Drain? Why is Open-Drain needed for I2C or shared buses?
+3. **GPIO Speed**: What does setting the GPIO speed to `Low (2MHz)`, `Medium (10MHz)`, or `High (50MHz)` physically change on the chip? What are the tradeoffs (EMI, slew rate, power consumption)?
+4. **Active Logic**: How does your driver abstract active-high and active-low so the user of the driver doesn't need to care?
 
 ---
 
-## General Engineering Directives
+## Required Deliverables
 
-* **No Sprawling `main.c`**: Never dump low-level driver logic directly into `main.c`. Keep `main.c` reserved for state initialization and application loop coordination.
-* **Defensive Programming**: Check return statuses of HAL initialization routines.
-* **Non-Blocking Architecture**: Avoid blocking `HAL_Delay()` wherever timers or state machines can achieve non-blocking execution.
-* **Meaningful Git Commits**: Commit regularly as you pass milestones. Write descriptive commit messages.
+Submit the following items:
+1. **Source Code**:
+   * Complete `Firmware/` folder containing your `.ioc`, `Core/`, and `Drivers/BSP/LED/` files.
+2. **Simulation / Hardware Media**:
+   * Screenshots of the schematic in Proteus with logic probes indicating voltage levels.
+   * Short video/GIF showing the alternating blinking behavior in real-time.
+3. **Task Documentation Report**:
+   * Completed [`Template_Report.md`](Template_Report.md) filled with your step-by-step process, challenges, and debugging log.
