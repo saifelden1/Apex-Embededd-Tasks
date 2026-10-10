@@ -1,91 +1,131 @@
-# Apex Racing Team — Embedded Systems Learning Phase
+# Task 2 — Analog Potentiometer Sampling via ADC & LED Dimming via Timer PWM
 
-[![Platform](https://img.shields.io/badge/Platform-STM32F103C8T6%20(Blue%20Pill)-blue.svg)](https://www.st.com)
-[![IDE](https://img.shields.io/badge/IDE-STM32CubeIDE%20v1.14+-darkgreen.svg)](https://www.st.com/en/development-tools/stm32cubeide.html)
-[![Simulation](https://img.shields.io/badge/Simulation-Proteus%208.13+-orange.svg)](https://www.labcenter.com)
-[![Language](https://img.shields.io/badge/Language-Embedded%20C-brightgreen.svg)](#)
-
-Welcome to the **Apex Racing Team** Embedded Systems Onboarding & Training Track. This training program is designed to build foundational hands-on proficiency in microcontroller architecture, peripheral interfacing, modular driver development, and hardware-in-the-loop / schematic simulation.
+[![Target](https://img.shields.io/badge/Target-STM32F103C8T6%20(Blue%20Pill)-blue.svg)](#)
+[![Peripherals](https://img.shields.io/badge/Peripherals-ADC1%20%7C%20TIM2%20PWM-brightgreen.svg)](#)
+[![Simulation](https://img.shields.io/badge/Simulation-Proteus%208-orange.svg)](#)
 
 ---
 
-## Repository Structure & Branch Map
+## Objective
+In motorsport embedded systems (such as racecar telemetry and throttle controllers), analog sensors (throttle position sensors, suspension potentiometers, brake pressure transducers) must be continuously sampled, mapped, and used to drive actuators or diagnostic indicators.
 
-This repository uses dedicated Git branches for each milestone. Clone the repository and switch to the branch corresponding to your current task:
+The goal of this task is to configure the **STM32F103C8T6** to:
+1. Sample an analog potentiometer voltage using **ADC1** (12-bit resolution).
+2. Generate a hardware **Pulse Width Modulation (PWM)** signal using an internal hardware timer (**TIM2 Channel 2**).
+3. Map the sampled analog input dynamically to the PWM duty cycle to smoothly modulate LED brightness.
+4. Encapsulate all logic into modular **Board Support Package (BSP)** drivers (`potentiometer.h/.c` and `pwm_led.h/.c`).
+5. **Bonus Challenge**: Implement and compare ADC in **Polling**, **Interrupt**, and **DMA** modes.
 
-```bash
-git clone https://github.com/saifelden1/Apex-Embededd-Tasks.git
-cd Apex-Embededd-Tasks
-```
+---
 
-| Branch | Task Name | Key Focus | Target Hardware |
+## Hardware Specifications & Pin Mapping
+
+| Peripheral | MCU Pin | Function | Configuration Details |
 | :--- | :--- | :--- | :--- |
-| `main` | **Track Hub** | Guidelines, setup instructions, policies | — |
-| `task-1-gpio-led` | **Task 1: GPIO & LED Driver** | Clock tree, Push-Pull GPIO, Modular driver | STM32 Blue Pill + LEDs |
-| `task-2-adc-pwm` | **Task 2: ADC & Timer PWM** | Potentiometer sampling, Timer PWM dimming, ADC modes | STM32 Blue Pill + Pot + LED |
-| `task-3-uart-display` | **Task 3: Dual-MCU UART & Display** | Cross-board serial telemetry, Display driver | 2x STM32 Blue Pill + Screen |
+| **Potentiometer (Analog Input)** | `PA0` | `ADC1_IN0` | 12-bit Resolution (`0` to `4095`), 0.0V to 3.3V range |
+| **Dimmable LED (PWM Output)** | `PA1` | `TIM2_CH2` | PWM Generation, 1 kHz carrier frequency |
 
-To switch to a task branch:
-```bash
-git checkout <branch-name>
+> [!CAUTION]
+> **Voltage Constraint**: STM32 ADC inputs are rated for a maximum of **+3.3V (V_DDA)**. Do **NOT** connect a 5V supply rail to the potentiometer in physical hardware, as this can destroy the analog input pins. Always power the potentiometer from the MCU's `+3.3V` rail.
+
+---
+
+## Technical Milestones
+
+### Milestone 1: ADC1 Configuration in STM32CubeIDE
+1. Enable `ADC1` Channel 0 on `PA0`.
+2. Configure ADC parameters:
+   * **Data Alignment**: Right alignment.
+   * **Resolution**: 12-bit (`0` to `4095` counts).
+   * **Scan Conversion Mode**: Disabled (single channel).
+   * **Continuous Conversion Mode**: Enabled (or software-triggered).
+   * **Sampling Time**: `55.5 Cycles` or `239.5 Cycles` for impedance stabilization.
+   * **Clock Prescaler**: Ensure `PCLK2 / 6` or `PCLK2 / 8` so $ADCCLK \le 14\text{ MHz}$ (STM32F1 hardware specification limit).
+
+### Milestone 2: Hardware Timer PWM Configuration (TIM2 Channel 2)
+1. Configure `TIM2` Channel 2 as `PWM Generation CH2` on pin `PA1`.
+2. Clock calculation for a **1 kHz** PWM carrier frequency (assuming 72 MHz SYSCLK / APB1 Timer clock = 72 MHz):
+   $$\text{Timer Frequency} = \frac{\text{Clock}}{(\text{PSC} + 1) \times (\text{ARR} + 1)}$$
+   * **Prescaler (PSC)**: `71` $\rightarrow$ Timer clock ticks at $72\text{ MHz} / (71 + 1) = 1\text{ MHz}$ ($1\ \mu\text{s}$ per tick).
+   * **Auto-Reload Register (ARR)**: `999` $\rightarrow$ Period $= 1000\ \mu\text{s} = 1\text{ ms}$ ($1\text{ kHz}$).
+   * **Pulse (CCR2)**: Initialized to `0`. Range: `0` to `999` ($0\%$ to $100\%$ duty cycle).
+
+### Milestone 3: Modular BSP Driver Design
+
+#### 1. Potentiometer Driver (`Drivers/BSP/Potentiometer/potentiometer.h` & `potentiometer.c`)
+```c
+typedef struct {
+    ADC_HandleTypeDef *hadc;
+    uint32_t           channel;
+    uint16_t           raw_value;
+    float              voltage;
+    float              percentage;
+} POT_Handle_t;
+
+void     POT_Init(POT_Handle_t *hpot, ADC_HandleTypeDef *hadc, uint32_t channel);
+uint16_t POT_ReadRaw(POT_Handle_t *hpot);
+float    POT_ReadVoltage(POT_Handle_t *hpot);
+float    POT_ReadPercentage(POT_Handle_t *hpot);
 ```
 
----
+#### 2. PWM LED Driver (`Drivers/BSP/PWM_LED/pwm_led.h` & `pwm_led.c`)
+```c
+typedef struct {
+    TIM_HandleTypeDef *htim;
+    uint32_t           channel;
+    uint32_t           arr_period;
+    float              current_duty;
+} PWM_LED_Handle_t;
 
-## Training Philosophy & AI Usage Policy
+void PWM_LED_Init(PWM_LED_Handle_t *hled, TIM_HandleTypeDef *htim, uint32_t channel, uint32_t arr_period);
+void PWM_LED_Start(PWM_LED_Handle_t *hled);
+void PWM_LED_Stop(PWM_LED_Handle_t *hled);
+void PWM_LED_SetDutyCycle(PWM_LED_Handle_t *hled, float duty_percent);
+void PWM_LED_SetRawPulse(PWM_LED_Handle_t *hled, uint32_t pulse);
+```
 
-> [!IMPORTANT]
-> **AI Usage & Oral Code Defense Policy**
-> * Using AI tools (ChatGPT, Claude, Copilot, Gemini, etc.) as learning assistants, documentation summarizers, and debugging aids is **permitted and encouraged**.
-> * **However**, submitting code generated without full comprehension is strictly disqualified.
-> * **Every applicant will participate in an oral code defense interview where you will be asked to explain and justify every single line of code, register configuration, and HAL API call in your submission.**
-> * If you cannot clearly explain why a line exists, how the underlying hardware register responds, or how timing is affected, the task will not be accepted.
-
----
-
-## Required Submission Package
-
-For each completed task branch, you must provide:
-
-1. **Modular Source Code**:
-   * Clean separation between application logic (`Core/Src/main.c`) and hardware peripherals.
-   * Dedicated `.h` (header) and `.c` (source) files inside `Drivers/BSP/` for all connected hardware.
-2. **Simulation / Hardware Verification Media**:
-   * High-resolution screenshots demonstrating the working circuit in **Proteus** (or physical bench).
-   * Short recorded demo video (or GIF) showcasing the dynamic functionality (e.g., LED toggling at the expected frequency, PWM changing with pot rotation, UART data streaming to display).
-3. **Task Documentation (`README.md` / Report)**:
-   * A detailed report (using the provided `Template_Report.md`) documenting:
-     * Clock configuration & peripheral settings.
-     * Hardware wiring / schematic breakdown.
-     * Architectural decisions behind your `.c`/`.h` driver design.
-     * Challenges encountered, bugs diagnosed, and the exact steps taken to fix them.
+### Milestone 4: Application Integration (`main.c`)
+In `main.c`:
+1. Initialize the potentiometer handle and start PWM generation.
+2. Inside the main loop:
+   * Read analog value from potentiometer.
+   * Map raw reading ($0 - 4095$) or percentage ($0.0 - 100.0\%$) to PWM duty cycle.
+   * Update PWM compare register (`CCR2`).
+   * Smoothly observe brightness changes.
 
 ---
 
-## Environment & Toolchain Setup
+## Bonus Challenge: ADC Multi-Mode Architecture
 
-### 1. Development Environment
-* **IDE**: [STM32CubeIDE (v1.14.0 or newer)](https://www.st.com/en/development-tools/stm32cubeide.html).
-* **Compiler**: GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`), packaged with CubeIDE.
-* **Firmware Package**: STM32Cube FW_F1 (Firmware package for STM32F1 series).
+Implement and document the differences between the 3 ADC sampling modes:
 
-### 2. Simulation Environment
-* **Proteus Design Suite**: Proteus 8.13 SP0 or higher.
-* Ensure the **STM32F103C8** model is available in your Proteus library.
-* Set the microcontroller properties in Proteus to:
-  * **Crystal Frequency**: `8MHz` (or `72MHz` internal clock matching your RCC settings).
-  * **Program File**: Point directly to your compiled `.hex` output located in `Firmware/Debug/`.
+| Mode | Mechanism | CPU Load | Typical Use Case |
+| :--- | :--- | :--- | :--- |
+| **1. Polling Mode** | `HAL_ADC_Start()`, `HAL_ADC_PollForConversion()` | **High (Blocking)** | Low-priority diagnostic checks, startup self-tests |
+| **2. Interrupt Mode** | `HAL_ADC_Start_IT()`, callback `HAL_ADC_ConvCpltCallback()` | **Medium (Non-blocking)** | Event-driven periodic sensor triggers |
+| **3. DMA Mode** | `HAL_ADC_Start_DMA()` continuous circular transfer | **Zero CPU Overhead** | High-speed telemetry, multi-channel sensor arrays |
 
-### 3. Physical Hardware (Optional / Bonus)
-* STM32F103C8T6 "Blue Pill" development board.
-* ST-Link V2 programmer / debugger.
-* Solderless breadboard, jumper wires, potentiometers (10kΩ), resistors (220Ω, 330Ω), and LEDs.
+> [!TIP]
+> To achieve the bonus, implement code branches or preprocessor directives (`#define ADC_MODE_POLLING`, `ADC_MODE_IT`, `ADC_MODE_DMA`) and document the CPU timing differences in your report!
 
 ---
 
-## General Engineering Directives
+## Oral Code Defense Preparation (Interview Topics)
 
-* **No Sprawling `main.c`**: Never dump low-level driver logic directly into `main.c`. Keep `main.c` reserved for state initialization and application loop coordination.
-* **Defensive Programming**: Check return statuses of HAL initialization routines.
-* **Non-Blocking Architecture**: Avoid blocking `HAL_Delay()` wherever timers or state machines can achieve non-blocking execution.
-* **Meaningful Git Commits**: Commit regularly as you pass milestones. Write descriptive commit messages.
+Be prepared to answer the following questions during your oral code defense:
+1. **ADC Max Clock Frequency**: Why must the ADC clock on the STM32F103 not exceed 14 MHz? What happens if you run the APB2 clock at 72 MHz and set the ADC prescaler to `/2` or `/4`?
+2. **Successive Approximation (SAR)**: How does a SAR ADC physically convert an analog voltage into a digital word? What role does the sample-and-hold capacitor play?
+3. **PWM Frequency Calculation**: Show the mathematical formula connecting Timer input clock, Prescaler, ARR, and output PWM frequency. Why is 1 kHz chosen for LED dimming rather than 10 Hz or 100 kHz?
+4. **DMA Ring Buffering**: Why is DMA continuous circular mode preferred for multi-channel sensor acquisition over polling?
+
+---
+
+## Required Deliverables
+
+1. **Source Code**:
+   * Complete `Firmware/` project including `potentiometer.h/.c` and `pwm_led.h/.c`.
+2. **Simulation / Hardware Media**:
+   * Proteus screenshot showing the circuit with the interactive potentiometer and the **Virtual Oscilloscope** displaying the PWM square wave at different duty cycles.
+   * Short video/GIF demonstrating the potentiometer knob turning and the LED brightness (and oscilloscope wave) responding smoothly.
+3. **Task Documentation Report**:
+   * Completed [`Template_Report.md`](Template_Report.md) with calculations, screenshots, bug fixes, and bonus mode analysis.
