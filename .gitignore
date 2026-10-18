@@ -25,3 +25,9 @@ Thumbs.db
 *~
 .vscode/
 .idea/
+
+# Internal Planning & Spreadsheet Documents (Do not push)
+*.xlsx
+*.xls
+*.csv
+planning/
