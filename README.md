@@ -33,7 +33,9 @@ Welcome to **Week 1** of the Apex Racing Team Embedded Systems Onboarding Track.
   * Understand Flash (`0x08000000`), SRAM (`0x20000000`), and peripheral bus routing.
 * **Day 3 (Wednesday) — CubeIDE Project, Debug & Blink**:
   * 📺 [Debug and Blink (First 30 min only)](https://www.youtube.com/watch?v=LIJ_G-LU_Qg&list=PLfIJKC1ud8ghW6bJq2lN-cAuElyF4hpvR)
+  * 📺 [Master Course (Min 00:49:34 – 01:14:38)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=2974s) — Changing Bits & Turning on an LED
   * Create project for `STM32F103C8`, configure PC13 & PA1, build project and verify `.hex` generation.
+
 * **Day 4 (Thursday) — Simple Driver Design & Live Q&A**:
   * 30-45 min drop-in session: writing simple helper functions in `led.h` & `led.c` (Init, On, Off, Toggle).
   * Address why PC13 onboard LED is active-low (0 is ON, 1 is OFF).
