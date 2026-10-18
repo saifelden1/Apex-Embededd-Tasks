@@ -32,23 +32,27 @@ Welcome to **Week 2** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
-## Daily Operational Guide
+## Daily Operational Guide & Curated Video Links
 
 * **Day 1 (Monday) — Build Pipeline**:
+  * 📺 [Compiling Process Video](https://www.youtube.com/watch?v=N2y6csonII4)
   * Understand the 4 stages: Preprocessing $\rightarrow$ Compiling $\rightarrow$ Assembling $\rightarrow$ Linking.
   * Learn what `.c`, `.h`, `.o`, `.elf`, and `.hex` files contain.
 * **Day 2 (Tuesday) — Memory Layout & Linker Script**:
   * Live session (45 mins): Walkthrough of the `.ld` linker script and reading the `.map` file.
+  * Search: `embedded memory sections text data bss map file`
   * Inspect your Week 1 `.map` file to find where `main()` and your variables live in Flash and RAM.
 * **Day 3 (Wednesday) — Stack vs Heap**:
   * Video drop & study: How the Stack grows downward and stores function call frames.
   * Understand stack overflow dangers and why `malloc()` is avoided in racecar firmware.
-* **Day 4 (Thursday) — Simple Debugger Lab & Office Hours**:
-  * 30-45 min drop-in session: Step Over (`F6`), Step Into (`F5`), and observing variables update in real time in CubeIDE.
-* **Day 5 (Friday) — Simple Button Input Lab**:
-  * Hands-on lab: Connect a push-button to `PA0` with internal pull-up in Proteus.
+* **Day 4 (Thursday) — Simple Debugger Lab & Button Input**:
+  * 📺 [Master Course (Min 01:14:38 – 01:45:00)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=4478s) — Projects 2 & 3: Receiving Input from a Button
+  * In-circuit debugging: Step Over (`F6`), Step Into (`F5`), and observing variables update in real time in CubeIDE.
+* **Day 5 (Friday) — Offline Lab Day (Simple Button Input)**:
+  * In-person lab meeting: Connect a push-button to `PA0` with internal pull-up in Proteus.
   * Read input using `HAL_GPIO_ReadPin()` to toggle an LED (no complex interrupt math).
 * **Day 6 (Saturday) — Submission Deadline**:
   * Submit short report with a screenshot of your `.map` file and a video/screenshot of your button controlling an LED in Proteus.
 * **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
   * 10-minute check-in: explain the 4 build stages, the difference between Stack and Heap, and what the `.map` file shows.
+
