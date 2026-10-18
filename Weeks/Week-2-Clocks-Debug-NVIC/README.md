@@ -1,42 +1,54 @@
-# Week 2 — Clock Tree (RCC), In-Circuit Debugging & Interrupts (NVIC/EXTI)
+# Week 2 — Build Pipeline (.ld, .map, .elf), Memory Sections & Stack vs Heap
 
 [![Week](https://img.shields.io/badge/Week-2%20of%206-blue.svg)](#)
-[![Focus](https://img.shields.io/badge/Focus-Clock%20Tree%20%7C%20SWD%20Debug%20%7C%20NVIC%2FEXTI-brightgreen.svg)](#)
+[![Focus](https://img.shields.io/badge/Focus-Build%20Pipeline%20%7C%20Memory%20Sections%20%7C%20Stack%20vs%20Heap-brightgreen.svg)](#)
 
 Welcome to **Week 2** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
 ## Weekly Objectives
-1. **STM32 Clock Architecture (RCC)**:
-   * Internal High Speed (HSI @ 8MHz) vs External High Speed (HSE @ 8MHz crystal).
-   * Phase-Locked Loop (PLL) configuration to reach maximum 72 MHz SYSCLK.
-   * Bus division: AHB prescaler (72MHz), APB1 low-speed peripheral bus (max 36MHz), APB2 high-speed peripheral bus (max 72MHz).
-2. **In-Circuit Debugging Techniques (SWD)**:
-   * Serial Wire Debug (SWCLK & SWDIO pins).
-   * Hardware breakpoints, watchpoints, live variable tracking.
-   * Special Function Register (SFR) view and Memory Browser.
-   * Debugging **HardFaults**: Inspecting the Link Register (LR), Program Counter (PC), and Fault Status Registers (`CFSR`, `HFSR`).
-3. **Interrupts & Nested Vectored Interrupt Controller (NVIC)**:
-   * Preemption Priority vs Sub-priority grouping.
-   * Interrupt Service Routine (ISR) latency and re-entrancy rules.
-   * External Interrupts (EXTI): Triggering events on rising/falling edge.
-   * Software and hardware button debouncing state machines.
+1. **The C Build Pipeline**:
+   * **Preprocessing (`gcc -E`)**: Expands `#include`, evaluates `#define` macros, handles `#ifdef` conditional compilation.
+   * **Compiling (`gcc -S`)**: Translates high-level C code into Cortex-M assembly instructions.
+   * **Assembling (`as`)**: Converts assembly text into machine-code relocatable object files (`.o`).
+   * **Linking (`ld`)**: Combines object files with runtime libraries using the Linker Script (`.ld`), resolving symbol addresses.
+2. **Output Build Artifacts**:
+   * `.elf` (Executable and Linkable Format): Contains binary code, debug symbols, and section headers.
+   * `.hex` & `.bin`: Raw binary images flashed to the STM32 Flash memory.
+   * `.map` file: Detailed blueprint showing the exact memory address and size of every function and variable.
+3. **Memory Sections (Flash vs SRAM)**:
+   * **`.text`**: Program code and interrupt vector table (Stored in Flash).
+   * **`.rodata`**: Read-only constants, string literals (Stored in Flash).
+   * **`.data`**: Initialized global and static variables (Stored in Flash, copied to RAM at startup).
+   * **`.bss`**: Uninitialized global and static variables (Allocated in RAM, zeroed at startup).
+4. **RAM Organization: Stack vs Heap**:
+   * **The Stack**: Grows downward in RAM; automatically stores local variables, return addresses, and interrupt context.
+   * **The Heap**: Dynamic memory allocation via `malloc()` and `free()`.
+   * **Racing Directive**: Why dynamic memory is strictly banned in safety-critical vehicle controllers (fragmentation risk, unpredictable allocation latency).
+5. **Basic Debugging & Simple Input**:
+   * Setting hardware breakpoints in CubeIDE and stepping through code (`F5`, `F6`).
+   * Reading a simple push button on `PA0` without complex interrupt configuration.
 
 ---
 
 ## Daily Operational Guide
 
-* **Day 1 (Monday)**: Watch curated lectures on STM32 RCC clock tree and NVIC priority registers.
-* **Day 2 (Tuesday)**: Attend live whiteboard session: analyzing HardFault exceptions and stack dump unwinding.
-* **Day 3 (Wednesday)**: Live coding lab: configuring EXTI push button on PB0 to trigger non-blocking LED toggle.
-* **Day 4 (Thursday)**: Office hours for debugging clock frequency mismatch and Proteus crystal settings.
-* **Day 5 (Friday)**: Practice SWD breakpoint stepping and inspect memory registers during active interrupts.
-* **Day 6 (Saturday)**: Submit Week 2 Lab Report documenting clock calculations and EXTI state machine code.
-* **Day 7 (Sunday)**: Attend 1-on-1 oral defense review.
-
----
-
-## Key Formula for Clock Verification
-$$\text{SYSCLK} = \frac{\text{HSE}}{\text{PREDIV}} \times \text{PLLMUL} = \frac{8\text{ MHz}}{1} \times 9 = 72\text{ MHz}$$
-$$\text{APB1 Clock} = \frac{\text{SYSCLK}}{\text{APB1\_DIV}} = \frac{72\text{ MHz}}{2} = 36\text{ MHz}$$
+* **Day 1 (Monday) — Build Pipeline**:
+  * Understand the 4 stages: Preprocessing $\rightarrow$ Compiling $\rightarrow$ Assembling $\rightarrow$ Linking.
+  * Learn what `.c`, `.h`, `.o`, `.elf`, and `.hex` files contain.
+* **Day 2 (Tuesday) — Memory Layout & Linker Script**:
+  * Live session (45 mins): Walkthrough of the `.ld` linker script and reading the `.map` file.
+  * Inspect your Week 1 `.map` file to find where `main()` and your variables live in Flash and RAM.
+* **Day 3 (Wednesday) — Stack vs Heap**:
+  * Video drop & study: How the Stack grows downward and stores function call frames.
+  * Understand stack overflow dangers and why `malloc()` is avoided in racecar firmware.
+* **Day 4 (Thursday) — Simple Debugger Lab & Office Hours**:
+  * 30-45 min drop-in session: Step Over (`F6`), Step Into (`F5`), and observing variables update in real time in CubeIDE.
+* **Day 5 (Friday) — Simple Button Input Lab**:
+  * Hands-on lab: Connect a push-button to `PA0` with internal pull-up in Proteus.
+  * Read input using `HAL_GPIO_ReadPin()` to toggle an LED (no complex interrupt math).
+* **Day 6 (Saturday) — Submission Deadline**:
+  * Submit short report with a screenshot of your `.map` file and a video/screenshot of your button controlling an LED in Proteus.
+* **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
+  * 10-minute check-in: explain the 4 build stages, the difference between Stack and Heap, and what the `.map` file shows.

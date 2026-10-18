@@ -22,15 +22,28 @@ Welcome to **Week 1** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
-## Daily Operational Guide
+## Daily Operational Guide & Curated Video Links
 
-* **Day 1 (Monday)**: Watch curated toolchain installation videos and study Cortex-M memory architecture.
-* **Day 2 (Tuesday)**: Attend live technical whiteboard session on GPIO internal circuits.
-* **Day 3 (Wednesday)**: Replicate live CubeIDE project creation and Proteus simulation setup.
-* **Day 4 (Thursday)**: Join office hours for setup debugging and hardware verification.
-* **Day 5 (Friday)**: Complete modular driver implementation (`led.c` & `led.h`) and record simulation video.
-* **Day 6 (Saturday)**: Submit Task 1 PR and completed `Template_Report.md`.
-* **Day 7 (Sunday)**: Attend 1-on-1 oral code defense interview.
+* **Day 1 (Monday) — Git & Toolchain Setup**:
+  * 📺 [Git & GitHub Tutorial](https://www.youtube.com/watch?v=mAFoROnOfHs)
+  * Install STM32CubeIDE & Proteus 8.13. Clone repository and verify local environment.
+* **Day 2 (Tuesday) — Memory Map & Bus System**:
+  * 📺 [ARM Cortex-M Memory Map](https://www.youtube.com/watch?v=hyIEUCIVhQQ&t=895s)
+  * 📺 [Bus Interface (AHB / APB)](https://www.youtube.com/watch?v=jTASGW8HEa0&list=PLoiqjtgvXf9e2VJk8GWEXwECPM_7JRwkE&index=9)
+  * Understand Flash (`0x08000000`), SRAM (`0x20000000`), and peripheral bus routing.
+* **Day 3 (Wednesday) — CubeIDE Project, Debug & Blink**:
+  * 📺 [Debug and Blink (First 30 min only)](https://www.youtube.com/watch?v=LIJ_G-LU_Qg&list=PLfIJKC1ud8ghW6bJq2lN-cAuElyF4hpvR)
+  * Create project for `STM32F103C8`, configure PC13 & PA1, build project and verify `.hex` generation.
+* **Day 4 (Thursday) — Simple Driver Design & Live Q&A**:
+  * 30-45 min drop-in session: writing simple helper functions in `led.h` & `led.c` (Init, On, Off, Toggle).
+  * Address why PC13 onboard LED is active-low (0 is ON, 1 is OFF).
+* **Day 5 (Friday) — Simulation Lab**:
+  * Build circuit in Proteus (STM32F103 + Resistor + LED). Load `.hex` file and record a 10-second demo video of alternating blinking.
+* **Day 6 (Saturday) — Submission Deadline**:
+  * Submit PR link or files, demo video, and completed `Template_Report.md` by 11:59 PM.
+* **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
+  * 10-minute conversational check-in: explain your code line-by-line and demonstrate understanding.
+
 
 ---
 
