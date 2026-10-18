@@ -18,17 +18,28 @@ git clone https://github.com/saifelden1/Apex-Embededd-Tasks.git
 cd Apex-Embededd-Tasks
 ```
 
+### 6-Week Curriculum Branches (Syllabus & Lecture Guides)
+| Branch | Week | Focus Areas | Associated Milestone |
+| :--- | :--- | :--- | :--- |
+| `week-1-gpio-arch` | **Week 1** | Cortex-M3 Architecture, CubeIDE, Git/AI Rules, GPIOs | `task-1-gpio-led` |
+| `week-2-clocks-debug-nvic` | **Week 2** | Clock Tree (RCC), SWD Debugging, HardFaults, NVIC & EXTI | EXTI Lab Report |
+| `week-3-timers-pwm-basics` | **Week 3** | Timer Fundamentals (PSC, ARR, CNT), PWM Generation | `task-2-adc-pwm` (Part 1) |
+| `week-4-adc-analog-sensors` | **Week 4** | 12-Bit ADC, Potentiometer Readout, Sampling Time, DMA | `task-2-adc-pwm` (Part 2) |
+| `week-5-serial-uart-i2c` | **Week 5** | UART 115200 8N1, Ring Buffers, I2C Bus Fundamentals | `task-3-uart-display` (Part 1) |
+| `week-6-spi-can-dualmcu` | **Week 6** | High-Speed SPI, Automotive CAN Bus Overview, Dual-MCU | `task-3-uart-display` (Part 2) |
+
+### Practical Milestone Task Branches (Code & Simulation Assignments)
 | Branch | Task Name | Key Focus | Target Hardware |
 | :--- | :--- | :--- | :--- |
-| `main` | **Track Hub** | Guidelines, setup instructions, policies | — |
-| `task-1-gpio-led` | **Task 1: GPIO & LED Driver** | Clock tree, Push-Pull GPIO, Modular driver | STM32 Blue Pill + LEDs |
-| `task-2-adc-pwm` | **Task 2: ADC & Timer PWM** | Potentiometer sampling, Timer PWM dimming, ADC modes | STM32 Blue Pill + Pot + LED |
-| `task-3-uart-display` | **Task 3: Dual-MCU UART & Display** | Cross-board serial telemetry, Display driver | 2x STM32 Blue Pill + Screen |
+| `task-1-gpio-led` | **Task 1: GPIO & LED Driver** | Modular `led.h/.c` driver, active-low/high, Proteus simulation | STM32 Blue Pill + LEDs |
+| `task-2-adc-pwm` | **Task 2: ADC & Timer PWM** | Potentiometer sampling, 1kHz PWM dimming, multi-mode ADC bonus | STM32 Blue Pill + Pot + LED |
+| `task-3-uart-display` | **Task 3: Dual-MCU UART & Display** | Cross-board serial telemetry, Abstract display driver | 2x STM32 Blue Pill + Screen |
 
-To switch to a task branch:
+To switch to any branch:
 ```bash
 git checkout <branch-name>
 ```
+
 
 ---
 
