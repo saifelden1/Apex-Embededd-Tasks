@@ -1,0 +1,33 @@
+# Embedded IDE / STM32CubeIDE
+.metadata/
+Debug/
+Release/
+*.launch
+*.o
+*.d
+*.su
+*.map
+*.elf
+*.bin
+*.hex
+*.axf
+
+# Proteus CAD / Simulation Backups
+*.pdsbak
+*.workspace
+*.pdsprj.*.workspace
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*~
+.vscode/
+.idea/
+
+# Internal Planning & Spreadsheet Documents (Do not push)
+*.xlsx
+*.xls
+*.csv
+planning/

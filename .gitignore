@@ -30,4 +30,7 @@ Thumbs.db
 *.xlsx
 *.xls
 *.csv
+.~lock.*
+~$*
 planning/
+
