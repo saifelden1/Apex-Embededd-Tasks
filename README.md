@@ -27,15 +27,34 @@ Welcome to **Week 3** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
-## Daily Operational Guide
+## Daily Operational Guide & Curated Video Links
 
-* **Day 1 (Monday)**: Watch video lectures explaining Prescaler, Auto-Reload, and Output Compare mechanics.
-* **Day 2 (Tuesday)**: Attend live whiteboard session: deriving the mathematical PWM frequency and resolution equations.
-* **Day 3 (Wednesday)**: Replicate live lab: setting up TIM2 PWM on PA1 and probing the output on the Proteus virtual oscilloscope.
-* **Day 4 (Thursday)**: Office hours for troubleshooting timer clock calculations and APB1 timer multipliers.
-* **Day 5 (Friday)**: Complete modular PWM driver (`pwm_led.c` & `pwm_led.h`) to smoothly vary LED brightness.
-* **Day 6 (Saturday)**: Submit PWM driver code and oscilloscope waveform captures.
-* **Day 7 (Sunday)**: Attend 1-on-1 oral defense review.
+* **Day 1 (Monday) — Timer Architecture & Prescalers**:
+  * 📺 [Master Course (Min 04:19:48 – 04:42:43)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=15588s) — Projects 11 & 12: Prescaler & ARR
+  * 📺 [Timer Video 1: Timer Basics](https://www.youtube.com/watch?v=DyyYaGU4biY)
+  * 📺 [Timers Playlist (Videos 1-2)](https://www.youtube.com/playlist?list=PLfIJKC1ud8gjLZBzjE3kKBMDEH_lUc428)
+  * Calculate PSC and ARR for 1 kHz at 72 MHz clock ($PSC=71, ARR=999$).
+* **Day 2 (Tuesday) — Timer Modes & Timer Interrupts**:
+  * 📺 [Timer Video 2: Concepts](https://www.youtube.com/watch?v=4qjRQL6MVRo) & [Timer Video 3: Registers](https://www.youtube.com/watch?v=RZ0uszK2PMo)
+  * 📺 [Timers & Timer Interrupts](https://www.youtube.com/watch?v=VfbW6nfG4kw)
+  * 📺 [Timers Playlist (Videos 3-4)](https://www.youtube.com/playlist?list=PLfIJKC1ud8gjLZBzjE3kKBMDEH_lUc428)
+  * Understand Up/Down/Center-aligned counting and timer overflow events.
+* **Day 3 (Wednesday) — Live Session: PWM Signal Generation**:
+  * 45-min live session: Configuring TIM2 Channel 2 on PA1 in CubeIDE for 1 kHz PWM.
+  * 📺 [Master Course PWM (Min 04:42:43 – 05:14:00)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=16963s) — Projects 13 & 16: PWM & LED Dimming
+  * 📺 [Dedicated PWM Guide](https://www.youtube.com/watch?v=AjN58ceQaF4)
+  * 📺 [Timers Playlist (Video 5)](https://www.youtube.com/playlist?list=PLfIJKC1ud8gjLZBzjE3kKBMDEH_lUc428)
+* **Day 4 (Thursday) — Helper Driver Coding**:
+  * Write simple helper functions in `pwm_led.h` & `pwm_led.c` (`PWM_LED_Init`, `PWM_LED_SetDutyCycle`).
+  * Use `__HAL_TIM_SET_COMPARE()` to dynamically vary the pulse width.
+* **Day 5 (Friday) — Offline Lab Day**:
+  * Meet mentor at team workshop: connect Virtual Oscilloscope to PA1 in Proteus.
+  * Observe square wave expanding and shrinking at 25%, 50%, 75% duty cycle.
+* **Day 6 (Saturday) — Submission Deadline**:
+  * Submit PWM driver code and oscilloscope captures/demo video by 11:59 PM.
+* **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
+  * 10-minute check-in: explain the PWM equation ($f = \frac{f_{clk}}{(PSC+1)(ARR+1)}$) and how CCR controls duty cycle.
+
 
 ---
 
