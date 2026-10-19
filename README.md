@@ -18,27 +18,34 @@ git clone https://github.com/saifelden1/Apex-Embededd-Tasks.git
 cd Apex-Embededd-Tasks
 ```
 
-### 6-Week Curriculum Branches (Syllabus & Lecture Guides)
-| Branch | Week | Focus Areas | Associated Milestone |
-| :--- | :--- | :--- | :--- |
-| `week-1-gpio-arch` | **Week 1** | Cortex-M3 Architecture, CubeIDE, Git/AI Rules, GPIOs | `task-1-gpio-led` |
-| `week-2-clocks-debug-nvic` | **Week 2** | Clock Tree (RCC), SWD Debugging, HardFaults, NVIC & EXTI | EXTI Lab Report |
-| `week-3-timers-pwm-basics` | **Week 3** | Timer Fundamentals (PSC, ARR, CNT), PWM Generation | `task-2-adc-pwm` (Part 1) |
-| `week-4-adc-analog-sensors` | **Week 4** | 12-Bit ADC, Potentiometer Readout, Sampling Time, DMA | `task-2-adc-pwm` (Part 2) |
-| `week-5-serial-uart-i2c` | **Week 5** | UART 115200 8N1, Ring Buffers, I2C Bus Fundamentals | `task-3-uart-display` (Part 1) |
-| `week-6-spi-can-dualmcu` | **Week 6** | High-Speed SPI, Automotive CAN Bus Overview, Dual-MCU | `task-3-uart-display` (Part 2) |
+### 6-Week Curriculum Roadmap & Materials
+| Week | Module | Assigned Videos | Core Focus Areas | Local Directory | Branch |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| **Week 1** | Foundations & GPIO | **5 Videos** (~1.5h) | ARM Cortex-M3 Memory Map, Bus Matrix (AHB/APB), Push-Pull vs Open-Drain, Active-Low LEDs | [`Weeks/Week-1-GPIO-Arch/`](file:///d:/APEXALL/EmbdeddSystem/Weeks/Week-1-GPIO-Arch/) | `week-1-gpio-arch` |
+| **Week 2** | Build Pipeline & Memory | **2 Videos** (~45m) | C Build Pipeline (Preprocess $\rightarrow$ Link), Memory Sections (.text, .data, .bss, Stack vs Heap), SWD Debugging & Button Input | [`Weeks/Week-2-Clocks-Debug-NVIC/`](file:///d:/APEXALL/EmbdeddSystem/Weeks/Week-2-Clocks-Debug-NVIC/) | `week-2-clocks-debug-nvic` |
+| **Week 3** | Timers & PWM Basics | **7 Videos** (~2.0h) | Hardware Timer Registers (CNT, PSC, ARR), 1 kHz PWM Carrier Generation, Duty Cycle Output Compare (CCR) | [`Weeks/Week-3-Timers-PWM-Basics/`](file:///d:/APEXALL/EmbdeddSystem/Weeks/Week-3-Timers-PWM-Basics/) | `week-3-timers-pwm-basics` |
+| **Week 4** | 12-Bit ADC & DMA | **4 Videos** (~1.2h) | 12-Bit SAR ADC (0-4095), 14 MHz ADCCLK Limit, Potentiometer Sampling, Polling vs Interrupt vs DMA Circular Mode | [`Weeks/Week-4-ADC-Analog-Sensors/`](file:///d:/APEXALL/EmbdeddSystem/Weeks/Week-4-ADC-Analog-Sensors/) | `week-4-adc-analog-sensors` |
+| **Week 5** | UART Deep-Dive & I2C | **8 Videos** (~2.2h) | UART 115200 8N1 Interrupt Reception, Ring Buffers, Telemetry Packets (0xAA/0x55/XOR), Fast I2C Theory & Pull-ups | [`Weeks/Week-5-Serial-UART-I2C/`](file:///d:/APEXALL/EmbdeddSystem/Weeks/Week-5-Serial-UART-I2C/) | `week-5-serial-uart-i2c` |
+| **Week 6** | Dual-MCU & SPI/CAN | **TBD** (Awaiting) | Dual STM32 Telemetry Cross-Link, Abstract Display Driver (`display_interface.c`), Fast SPI & Automotive CAN Theory | [`Weeks/Week-6-SPI-CAN-DualMCU/`](file:///d:/APEXALL/EmbdeddSystem/Weeks/Week-6-SPI-CAN-DualMCU/) | `week-6-spi-can-dualmcu` |
 
-### Practical Milestone Task Branches (Code & Simulation Assignments)
-| Branch | Task Name | Key Focus | Target Hardware |
-| :--- | :--- | :--- | :--- |
-| `task-1-gpio-led` | **Task 1: GPIO & LED Driver** | Modular `led.h/.c` driver, active-low/high, Proteus simulation | STM32 Blue Pill + LEDs |
-| `task-2-adc-pwm` | **Task 2: ADC & Timer PWM** | Potentiometer sampling, 1kHz PWM dimming, multi-mode ADC bonus | STM32 Blue Pill + Pot + LED |
-| `task-3-uart-display` | **Task 3: Dual-MCU UART & Display** | Cross-board serial telemetry, Abstract display driver | 2x STM32 Blue Pill + Screen |
+### Practical Milestone Tasks (Code & Simulation Assignments)
+| Task | Target Peripherals | Key Deliverable | Local Directory | Branch |
+| :--- | :--- | :--- | :--- | :--- |
+| **Task 1: GPIO & LED Driver** | PC13, PA1 (GPIOs) | Modular `led.h/.c` driver, active-low/high alternating blink, Proteus circuit | [`Tasks/Task-1-GPIO-LED/`](file:///d:/APEXALL/EmbdeddSystem/Tasks/Task-1-GPIO-LED/) | `task-1-gpio-led` |
+| **Task 2: ADC & Timer PWM** | PA0 (ADC1), PA1 (TIM2 PWM) | Potentiometer sampling mapped to 1 kHz PWM dimming, multi-mode ADC comparison | [`Tasks/Task-2-ADC-PWM/`](file:///d:/APEXALL/EmbdeddSystem/Tasks/Task-2-ADC-PWM/) | `task-2-adc-pwm` |
+| **Task 3: Dual-MCU & Display** | 2x STM32, USART1, Screen | Cross-board serial telemetry stream, Abstract display driver, Proteus dual simulation | [`Tasks/Task-3-UART-Display/`](file:///d:/APEXALL/EmbdeddSystem/Tasks/Task-3-UART-Display/) | `task-3-uart-display` |
 
-To switch to any branch:
-```bash
-git checkout <branch-name>
-```
+> [!TIP]
+> **Navigation Tip**: All tasks and weekly materials are available **both** as direct folders on the `main` branch (for immediate browsing) and as isolated Git branches (`git checkout <branch-name>`) for branching your work.
+
+---
+
+## Master Spreadsheet Roadmap (`Apex_Embedded_6Week_Plan.xlsx`)
+
+The repository root includes a local planning spreadsheet (**never committed to Git**) containing:
+1. **`6_Week_Curriculum`**: High-contrast, screenshot-ready overview formatted with video counts and watch times for team announcement chats.
+2. **`Video_Directory`**: Central indexed directory of all 26 curated video links and master course timestamps.
+3. **`W1_Daily_Operations` – `W6_Daily_Operations`**: Day-by-day actionable operational guides following the 4-day active rhythm.
 
 
 ---
