@@ -24,15 +24,32 @@ Welcome to **Week 4** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
-## Daily Operational Guide
+## Daily Operational Guide & Curated Video Links
 
-* **Day 1 (Monday)**: Watch video lectures on SAR ADC conversion steps and analog reference voltages.
-* **Day 2 (Tuesday)**: Attend live whiteboard session: sampling time vs input impedance calculations and ADC clock limits.
-* **Day 3 (Wednesday)**: Live coding lab: configuring ADC1 Channel 0 (PA0) and mapping voltage to PWM duty cycle.
-* **Day 4 (Thursday)**: Office hours for debugging floating analog inputs and noisy readings.
-* **Day 5 (Friday)**: Complete modular driver implementation (`potentiometer.c` & `potentiometer.h`) and test multi-mode bonus.
-* **Day 6 (Saturday)**: Submit Task 2 PR with Proteus screenshots, video demonstration, and `Template_Report.md`.
-* **Day 7 (Sunday)**: Attend 1-on-1 oral defense review.
+* **Day 1 (Monday) — ADC Architecture & Quantization**:
+  * 📺 [Master Course (Min 05:06:27 – 05:35:00)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=18387s) — Projects 15 & 18: ADC Control & Servo/Potentiometer
+  * Understand 12-bit quantization, $V_{REF}=3.3\text{V}$, and $ADCCLK \le 14\text{ MHz}$ prescaler rule.
+  * Calculate voltage conversion: $V = \frac{\text{ADC\_RAW}}{4095} \times 3.3\text{V}$.
+* **Day 2 (Tuesday) — Direct Memory Access (DMA) Deep-Dive**:
+  * 📺 [DMA All Modes Short](https://www.youtube.com/watch?v=UTYdhF7lxFs)
+  * 📺 [DMA Single Mode Short](https://www.youtube.com/watch?v=d0aO6HF2Eu0)
+  * 📺 [DMA In Depth](https://www.youtube.com/watch?v=deMF2xu_ASQ)
+  * Compare Polling vs Interrupt vs DMA circular mode and understand why DMA offloads the CPU.
+* **Day 3 (Wednesday) — Live Session: Task 2 ADC + PWM Pipeline**:
+  * 45-min live session: Configuring ADC1 Channel 0 (PA0) and mapping analog reading directly to PWM duty cycle on PA1.
+  * Live demonstration of `HAL_ADC_Start()`, `HAL_ADC_GetValue()`, and circular buffer DMA setup (`HAL_ADC_Start_DMA()`).
+  * Follow live demo; configure ADC1 in CubeIDE and build with 0 errors.
+* **Day 4 (Thursday) — Potentiometer Helper Driver Coding**:
+  * Write simple helper driver in `potentiometer.h` & `potentiometer.c` (`POT_Init`, `POT_ReadRaw`, `POT_ReadPercentage`).
+  * Map raw 0-4095 count to PWM compare register (`__HAL_TIM_SET_COMPARE`) to dynamically control LED brightness.
+* **Day 5 (Friday) — Offline Lab Day**:
+  * In-person meeting at team workshop: connect interactive potentiometer in Proteus (or physical breadboard).
+  * Observe smooth LED dimming and oscilloscope pulse widening.
+* **Day 6 (Saturday) — Submission Deadline (Task 2)**:
+  * Submit Task 2 deliverable: code + Proteus demo video + `Template_Report.md` by 11:59 PM.
+* **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
+  * 10-minute check-in: explain why $ADCCLK \le 14\text{ MHz}$, how SAR converts voltage, and how DMA circular mode offloads the CPU.
+
 
 ---
 
