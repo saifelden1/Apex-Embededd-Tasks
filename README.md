@@ -9,21 +9,26 @@ Welcome to **Week 6** (Capstone Week) of the Apex Racing Team Embedded Systems O
 ---
 
 ## Weekly Objectives
-1. **SPI (Serial Peripheral Interface)**:
-   * High-speed 4-wire synchronous communication (MOSI, MISO, SCK, CS/NSS).
-   * Clock Polarity (`CPOL`) and Clock Phase (`CPHA`) 4-mode matrix.
-   * Interfacing high-speed vehicle sensors: Magnetic Angle Encoders (e.g. AS5047P / AS5048A) for BLDC rotor position, high-frequency IMUs.
-2. **Automotive CAN Bus (Controller Area Network)**:
-   * Differential physical layer (`CAN_H` / `CAN_L`) with $120\Omega$ split termination.
-   * Multi-master bus arbitration: Dominant (`0`) vs Recessive (`1`) bits, message identifier priority.
-   * Standard (11-bit) vs Extended (29-bit) CAN frames.
-   * Why CAN is the universal standard for racecar ECUs, motor controllers, and battery management systems (BMS).
-3. **Dual-MCU Distributed Architecture (Task 3 Finalization)**:
-   * Node 1 (Transmitter / Sensor ECU): Serializes vehicle metrics.
-   * Node 2 (Receiver / Dashboard ECU): Deserializes metrics and drives the abstract display layer.
-   * Common ground reference necessity in single-ended communication.
+
+> [!NOTE]
+> **Track Directive**: Protocols **SPI** and **CAN Bus** are introduced with a **fast theoretical foundation**, while the practical hands-on coding focuses on the **Dual-MCU UART Telemetry Bus and Display System**.
+
+1. **High-Speed SPI (Fast Theoretical Foundation)**:
+   * 4-wire synchronous communication: Master Out Slave In (`MOSI`), Master In Slave Out (`MISO`), Serial Clock (`SCK`), Chip Select (`CS`/`NSS`).
+   * Clock Polarity (`CPOL`) and Clock Phase (`CPHA`) 4-mode timing matrix.
+   * Racing application: Interfacing high-speed magnetic angle encoders (AS5047P / AS5048A) for BLDC motor rotor angle tracking.
+2. **Automotive CAN Bus (Fast Theoretical Foundation)**:
+   * Differential physical layer (`CAN_H` / `CAN_L`) with $120\Omega$ termination for high EMI noise immunity.
+   * Multi-master message-based arbitration: Dominant (`0`) overrides Recessive (`1`).
+   * Standard 11-bit vs Extended 29-bit CAN identifiers.
+   * Why CAN is standard across Formula Student / automotive ECUs, inverters, and battery management systems (BMS).
+3. **Dual-MCU Distributed Architecture (Hands-on Coding Focus)**:
+   * Node 1 (Transmitter ECU): Gathers simulated telemetry and serializes over USART1.
+   * Node 2 (Receiver ECU): Receives packet stream, decodes payload, and updates the modular display interface.
+   * Common ground reference rule in single-ended serial links.
 
 ---
+
 
 ## Daily Operational Guide
 
