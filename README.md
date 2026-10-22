@@ -1,58 +1,61 @@
-# Week 2 — Build Pipeline (.ld, .map, .elf), Memory Sections & Stack vs Heap
+# Week 2 — Cortex-M3 Architecture, GPIO Circuitry & Debugging
 
 [![Week](https://img.shields.io/badge/Week-2%20of%206-blue.svg)](#)
-[![Focus](https://img.shields.io/badge/Focus-Build%20Pipeline%20%7C%20Memory%20Sections%20%7C%20Stack%20vs%20Heap-brightgreen.svg)](#)
+[![Focus](https://img.shields.io/badge/Focus-Memory%20Map%20%7C%20GPIO%20%7C%20Debugging-brightgreen.svg)](#)
+[![Task](https://img.shields.io/badge/Task-task--1--gpio--led-orange.svg)](#)
 
 Welcome to **Week 2** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
 ## Weekly Objectives
-1. **The C Build Pipeline**:
-   * **Preprocessing (`gcc -E`)**: Expands `#include`, evaluates `#define` macros, handles `#ifdef` conditional compilation.
-   * **Compiling (`gcc -S`)**: Translates high-level C code into Cortex-M assembly instructions.
-   * **Assembling (`as`)**: Converts assembly text into machine-code relocatable object files (`.o`).
-   * **Linking (`ld`)**: Combines object files with runtime libraries using the Linker Script (`.ld`), resolving symbol addresses.
-2. **Output Build Artifacts**:
-   * `.elf` (Executable and Linkable Format): Contains binary code, debug symbols, and section headers.
-   * `.hex` & `.bin`: Raw binary images flashed to the STM32 Flash memory.
-   * `.map` file: Detailed blueprint showing the exact memory address and size of every function and variable.
-3. **Memory Sections (Flash vs SRAM)**:
-   * **`.text`**: Program code and interrupt vector table (Stored in Flash).
-   * **`.rodata`**: Read-only constants, string literals (Stored in Flash).
-   * **`.data`**: Initialized global and static variables (Stored in Flash, copied to RAM at startup).
-   * **`.bss`**: Uninitialized global and static variables (Allocated in RAM, zeroed at startup).
-4. **RAM Organization: Stack vs Heap**:
-   * **The Stack**: Grows downward in RAM; automatically stores local variables, return addresses, and interrupt context.
-   * **The Heap**: Dynamic memory allocation via `malloc()` and `free()`.
-   * **Racing Directive**: Why dynamic memory is strictly banned in safety-critical vehicle controllers (fragmentation risk, unpredictable allocation latency).
-5. **Basic Debugging & Simple Input**:
-   * Setting hardware breakpoints in CubeIDE and stepping through code (`F5`, `F6`).
-   * Reading a simple push button on `PA0` without complex interrupt configuration.
+1. **ARM Cortex-M3 Memory Map & Bus Matrix**:
+   * 4GB address space: Flash (`0x08000000`), SRAM (`0x20000000`), Peripherals (`0x40000000`).
+   * Bus Matrix: AHB (72 MHz), APB1 (36 MHz), APB2 (72 MHz) peripheral routing.
+2. **GPIO Circuitry Deep-Dive**:
+   * Push-Pull vs Open-Drain MOSFET structures.
+   * Internal Pull-Up and Pull-Down resistors.
+   * Why the onboard PC13 LED is **Active-Low** (Logic 0 = ON, Logic 1 = OFF).
+   * Bit Set/Reset Register (`BSRR`/`BRR`) vs Output Data Register (`ODR`).
+3. **In-Circuit Debugging (SWD)**:
+   * Setting hardware breakpoints in STM32CubeIDE.
+   * Stepping through code: Step Over (`F6`), Step Into (`F5`), Step Return (`F7`).
+   * Watching variables and inspecting Special Function Registers (SFRs) in real time.
+4. **Digital Input & Output**:
+   * Polling push-button input on `PA0` with internal pull-up using `HAL_GPIO_ReadPin()`.
+   * Driving LEDs on `PC13` and `PA1`.
 
 ---
 
-## Daily Operational Guide & Curated Video Links
+## Daily Operational Guide & Curated Links
 
-* **Day 1 (Monday) — Build Pipeline**:
-  * 📺 [Compiling Process Video](https://www.youtube.com/watch?v=N2y6csonII4)
-  * Understand the 4 stages: Preprocessing $\rightarrow$ Compiling $\rightarrow$ Assembling $\rightarrow$ Linking.
-  * Learn what `.c`, `.h`, `.o`, `.elf`, and `.hex` files contain.
-* **Day 2 (Tuesday) — Memory Layout & Linker Script**:
-  * Live session (45 mins): Walkthrough of the `.ld` linker script and reading the `.map` file.
-  * Search: `embedded memory sections text data bss map file`
-  * Inspect your Week 1 `.map` file to find where `main()` and your variables live in Flash and RAM.
-* **Day 3 (Wednesday) — Stack vs Heap**:
-  * Video drop & study: How the Stack grows downward and stores function call frames.
-  * Understand stack overflow dangers and why `malloc()` is avoided in racecar firmware.
-* **Day 4 (Thursday) — Simple Debugger Lab & Button Input**:
-  * 📺 [Master Course (Min 01:14:38 – 01:45:00)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=4478s) — Projects 2 & 3: Receiving Input from a Button
-  * In-circuit debugging: Step Over (`F6`), Step Into (`F5`), and observing variables update in real time in CubeIDE.
-* **Day 5 (Friday) — Offline Lab Day (Simple Button Input)**:
-  * In-person lab meeting: Connect a push-button to `PA0` with internal pull-up in Proteus.
-  * Read input using `HAL_GPIO_ReadPin()` to toggle an LED (no complex interrupt math).
-* **Day 6 (Saturday) — Submission Deadline**:
-  * Submit short report with a screenshot of your `.map` file and a video/screenshot of your button controlling an LED in Proteus.
+* **Day 1 (Monday) — Memory Map & Bus System**:
+  * 📺 [ARM Cortex-M Memory Map](https://www.youtube.com/watch?v=hyIEUCIVhQQ&t=895s)
+  * 📺 [Bus Interface (AHB / APB)](https://www.youtube.com/watch?v=jTASGW8HEa0)
+  * Understand Flash, SRAM, and GPIO peripheral base addresses.
+* **Day 2 (Tuesday) — GPIO Circuitry & Active-Low**:
+  * Push-Pull vs Open-Drain; why PC13 is active-low.
+  * Search: `STM32 GPIO push pull vs open drain active low`.
+* **Day 3 (Wednesday) — Live Session: CubeIDE Setup & Debugging**:
+  * 45-min live session: creating project for `STM32F103C8`, setting clocks, generating `.hex`.
+  * 📺 [Debug and Blink (First 30 min)](https://www.youtube.com/watch?v=LIJ_G-LU_Qg)
+  * 📺 [Master Course: GPIO Control](https://www.youtube.com/watch?v=vKyL43qXPpk&t=2974s)
+* **Day 4 (Thursday) — Button Input & Driver Coding**:
+  * 📺 [Master Course: Button Reading](https://www.youtube.com/watch?v=vKyL43qXPpk&t=4478s)
+  * Implement modular `led.h` and `led.c` helper driver; read button on `PA0`.
+* **Day 5 (Friday) — Offline Workshop Day**:
+  * Meet at workshop: assemble circuit in Proteus 8.13 (STM32 + LED + Button).
+  * Load `.hex` file and test button toggling LED in simulation.
+* **Day 6 (Saturday) — Milestone Task 1 Submission**:
+  * Submit Task 1 deliverable: modular code + Proteus demo video + report by 11:59 PM.
 * **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
-  * 10-minute check-in: explain the 4 build stages, the difference between Stack and Heap, and what the `.map` file shows.
+  * 10-minute check-in: explain why PC13 is active-low, how SWD breakpoints work, and walk through code line-by-line.
 
+---
+
+## Associated Milestone Task
+Switch to the official Task 1 branch:
+```bash
+git checkout task-1-gpio-led
+```
+Refer to [`Tasks/Task-1-GPIO-LED/README.md`](../../Tasks/Task-1-GPIO-LED/README.md) for full circuit specifications.
