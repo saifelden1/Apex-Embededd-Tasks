@@ -1,57 +1,49 @@
-# Week 1 — Architecture, Toolchain, Git/AI Workflow & GPIO Driver
+# Week 1 — Build Pipeline, Makefile/CMake & Git Workflow
 
 [![Week](https://img.shields.io/badge/Week-1%20of%206-blue.svg)](#)
-[![Focus](https://img.shields.io/badge/Focus-ARM%20Cortex--M3%20%7C%20GPIO%20%7C%20Git-brightgreen.svg)](#)
-[![Task](https://img.shields.io/badge/Task-task--1--gpio--led-orange.svg)](#)
+[![Focus](https://img.shields.io/badge/Focus-GCC%20Pipeline%20%7C%20Makefile%20%7C%20Git-brightgreen.svg)](#)
+[![Lab](https://img.shields.io/badge/Hands--on-Lab%20Directory-orange.svg)](Lab/)
 
 Welcome to **Week 1** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
 ## Weekly Objectives
-1. **Understand ARM Cortex-M Architecture**: Core registers (R0-R15), Program Counter (PC), Link Register (LR), Stack Pointer (MSP/PSP), memory map (Flash vs SRAM).
-2. **Environment Setup**: Install and configure STM32CubeIDE, ST-Link V2 drivers, and Proteus 8.13 simulation.
-3. **Git & AI Engineering Directives**:
-   * Master branch creation, commits, PR workflows.
-   * Understand the **AI Usage Policy**: AI tools are allowed for guidance, but you must pass an **oral line-by-line defense interview**.
-4. **GPIO Physical Layer**:
-   * Push-Pull vs Open-Drain MOSFET structures.
-   * Pull-Up / Pull-Down resistor configurations.
-   * Slew rate / speed settings and their effect on EMI.
-   * Bit Set/Reset Register (`BSRR` / `BRR`) vs Output Data Register (`ODR`).
+1. **The 4-Stage C Build Pipeline**:
+   * **Preprocessing (`gcc -E`)**: Expands `#include`, evaluates `#define` macros, strips comments.
+   * **Compiling (`gcc -S`)**: Translates high-level C code to human-readable Cortex-M / x86 assembly.
+   * **Assembling (`gcc -c`)**: Converts assembly text into machine-code relocatable object files (`.o`).
+   * **Linking (`gcc -o`)**: Resolves symbol addresses and links multiple `.o` files into the final executable (`.elf`/`.exe`).
+2. **Build Automation (Makefile vs CMake)**:
+   * **Makefile**: Direct toolchain instructions (`CC`, `CFLAGS`, targets, prerequisites, recipes). Every CubeIDE project secretly generates one in `Debug/makefile`.
+   * **CMake**: Modern meta-build system for cross-platform automation and automated testing.
+3. **Output Build Artifacts**:
+   * Inspecting intermediate files (`.i`, `.s`, `.o`, `.map`, `.elf`, `.hex`).
+4. **Git & GitHub Team Directives**:
+   * Clone, branch convention (`your-name/feature`), stage, commit, diff, and pull request.
+   * **AI Policy**: AI tools permitted for learning, but **100% mandatory 1-on-1 oral defense**.
 
 ---
 
-## Daily Operational Guide & Curated Video Links
+## Daily Operational Guide & Curated Links
 
-* **Day 1 (Monday) — Git & Toolchain Setup**:
+* **Day 1 (Monday) — Build Pipeline**:
+  * 📺 [C Compiling Process Video](https://www.youtube.com/watch?v=N2y6csonII4)
+  * Understand the 4 stages: Preprocess $\rightarrow$ Compile $\rightarrow$ Assemble $\rightarrow$ Link.
+* **Day 2 (Tuesday) — Git & Toolchain**:
   * 📺 [Git & GitHub Tutorial](https://www.youtube.com/watch?v=mAFoROnOfHs)
-  * Install STM32CubeIDE & Proteus 8.13. Clone repository and verify local environment.
-* **Day 2 (Tuesday) — Memory Map & Bus System**:
-  * 📺 [ARM Cortex-M Memory Map](https://www.youtube.com/watch?v=hyIEUCIVhQQ&t=895s)
-  * 📺 [Bus Interface (AHB / APB)](https://www.youtube.com/watch?v=jTASGW8HEa0&list=PLoiqjtgvXf9e2VJk8GWEXwECPM_7JRwkE&index=9)
-  * Understand Flash (`0x08000000`), SRAM (`0x20000000`), and peripheral bus routing.
-* **Day 3 (Wednesday) — CubeIDE Project, Debug & Blink**:
-  * 📺 [Debug and Blink (First 30 min only)](https://www.youtube.com/watch?v=LIJ_G-LU_Qg&list=PLfIJKC1ud8ghW6bJq2lN-cAuElyF4hpvR)
-  * 📺 [Master Course (Min 00:49:34 – 01:14:38)](https://www.youtube.com/watch?v=vKyL43qXPpk&t=2974s) — Changing Bits & Turning on an LED
-  * Create project for `STM32F103C8`, configure PC13 & PA1, build project and verify `.hex` generation.
-
-* **Day 4 (Thursday) — Simple Driver Design & Live Q&A**:
-  * 30-45 min drop-in session: writing simple helper functions in `led.h` & `led.c` (Init, On, Off, Toggle).
-  * Address why PC13 onboard LED is active-low (0 is ON, 1 is OFF).
-* **Day 5 (Friday) — Simulation Lab**:
-  * Build circuit in Proteus (STM32F103 + Resistor + LED). Load `.hex` file and record a 10-second demo video of alternating blinking.
-* **Day 6 (Saturday) — Submission Deadline**:
-  * Submit PR link or files, demo video, and completed `Template_Report.md` by 11:59 PM.
+  * Clone repository locally and verify local `gcc` and `make` installation.
+* **Day 3 (Wednesday) — Live Session: Hands-on CLI Compilation**:
+  * 45-min live session in [`Weeks/Week-1-GPIO-Arch/Lab/`](Lab/):
+  * Execute manual GCC commands step-by-step (`gcc -E`, `gcc -S`, `gcc -c`, `gcc -o`).
+  * Open and inspect `main.i`, `main.s`, and `main.o` live.
+* **Day 4 (Thursday) — Makefile Automation**:
+  * Study `Makefile` syntax (targets, prerequisites, recipes).
+  * Build project using `mingw32-make`; test `mingw32-make run` and `mingw32-make clean`.
+  * Inspect `CMakeLists.txt` for comparison.
+* **Day 5 (Friday) — Offline Workshop Day**:
+  * Meet at team workshop: resolve local compiler path issues and practice Git commands.
+* **Day 6 (Saturday) — Week 1 Submission**:
+  * Submit screenshots of manual GCC stage outputs (`.i`, `.s`, `.o`, execution) and `git status` by 11:59 PM.
 * **Day 7 (Sunday) — Friendly 1-on-1 Oral Check-in**:
-  * 10-minute conversational check-in: explain your code line-by-line and demonstrate understanding.
-
-
----
-
-## Associated Milestone Task
-Switch to the official Task 1 branch to complete your code and simulation assignment:
-```bash
-git checkout task-1-gpio-led
-```
-Refer to the `task-1-gpio-led` branch `README.md` for the complete API contract, pinout specifications, and reporting guidelines.
+  * 10-minute check-in: explain the 4 compilation stages and why Makefiles automate builds.
