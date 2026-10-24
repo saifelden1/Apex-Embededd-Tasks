@@ -25,6 +25,32 @@ Welcome to **Week 1** of the Apex Racing Team Embedded Systems Onboarding Track.
 
 ---
 
+## Required Software & Toolchain Dependencies
+
+All students must download and set up these core dependencies before Wednesday's live session:
+
+1. **Git for Windows (with Git Bash)**
+   * **Download**: [git-scm.com/download/win](https://git-scm.com/download/win)
+   * **Purpose**: Terminal environment (`bash`), Git version control, POSIX command execution (`rm`, `cat`, `tail`).
+
+2. **MinGW-w64 (GCC & Make)**
+   * **Download**: [WinLibs Standalone Build](https://winlibs.com/) or [w64devkit Release](https://github.com/skeeto/w64devkit/releases)
+   * **Purpose**: Host C compiler (`gcc`) and build automation tool (`mingw32-make` / `make`) for Week 1 CLI compilation exercises. Ensure the `bin` directory is added to your system `PATH`.
+
+3. **STM32CubeIDE (v1.14.0 or newer)**
+   * **Download**: [STMicroelectronics STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html)
+   * **Purpose**: Primary embedded IDE, ARM GCC toolchain (`arm-none-eabi-gcc`), HAL libraries, and SWD debugger for Weeks 2–6.
+
+4. **STM32CubeProgrammer**
+   * **Download**: [STMicroelectronics STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html)
+   * **Purpose**: Flashing utility, ST-Link firmware updater, and raw memory viewer.
+
+5. **Proteus 8 Professional (v8.13 or newer)**
+   * **Reference**: [Labcenter Electronics](https://www.labcenter.com/)
+   * **Purpose**: Circuit schematic and virtual microcontroller simulation environment for all tasks.
+
+---
+
 ## Daily Operational Guide & Curated Links
 
 * **Day 1 (Monday) — Build Pipeline**:

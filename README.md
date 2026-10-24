@@ -82,19 +82,23 @@ For each completed task branch, you must provide:
 
 ## Environment & Toolchain Setup
 
-### 1. Development Environment
-* **IDE**: [STM32CubeIDE (v1.14.0 or newer)](https://www.st.com/en/development-tools/stm32cubeide.html).
-* **Compiler**: GNU Arm Embedded Toolchain (`arm-none-eabi-gcc`), packaged with CubeIDE.
-* **Firmware Package**: STM32Cube FW_F1 (Firmware package for STM32F1 series).
+### 1. Core Prerequisites & Command-Line Tools
+* **Git for Windows (with Git Bash)**: [git-scm.com/download/win](https://git-scm.com/download/win) — Git version control and terminal environment (ash).
+* **MinGW-w64 (GCC & Make)**: [WinLibs Standalone Build](https://winlibs.com/) or [w64devkit Release](https://github.com/skeeto/w64devkit/releases) — Host GCC and Make toolchain for Week 1 compilation fundamentals.
 
-### 2. Simulation Environment
-* **Proteus Design Suite**: Proteus 8.13 SP0 or higher.
+### 2. Development Environment
+* **IDE**: [STM32CubeIDE (v1.14.0 or newer)](https://www.st.com/en/development-tools/stm32cubeide.html) — Primary embedded IDE with integrated rm-none-eabi-gcc toolchain, GDB debugger, and HAL drivers.
+* **Firmware Package**: STM32Cube FW_F1 (Firmware package for STM32F1 series).
+* **Flashing Utility**: [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) — Firmware flasher and ST-Link firmware updater.
+
+### 3. Simulation Environment
+* **Proteus Design Suite**: [Proteus 8.13 SP0 or higher](https://www.labcenter.com/).
 * Ensure the **STM32F103C8** model is available in your Proteus library.
 * Set the microcontroller properties in Proteus to:
-  * **Crystal Frequency**: `8MHz` (or `72MHz` internal clock matching your RCC settings).
-  * **Program File**: Point directly to your compiled `.hex` output located in `Firmware/Debug/`.
+  * **Crystal Frequency**: 8MHz (or 72MHz internal clock matching your RCC settings).
+  * **Program File**: Point directly to your compiled .hex output located in Firmware/Debug/.
 
-### 3. Physical Hardware (Optional / Bonus)
+### 4. Physical Hardware (Optional / Bonus)
 * STM32F103C8T6 "Blue Pill" development board.
 * ST-Link V2 programmer / debugger.
 * Solderless breadboard, jumper wires, potentiometers (10kΩ), resistors (220Ω, 330Ω), and LEDs.
